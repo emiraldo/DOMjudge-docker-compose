@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  domserver:
+    image: domjudge/domserver:latest
+    depends_on:
+      - mariadb
+    env_file: .env
+    ports:
+      - "9090:80"
+    networks:
+      - domserver
+  
+  mariadb:
+    image: mariadb
+    env_file: .env
+    ports:
+      - "3306:3306"
+    networks:
+      - domserver
+  
+  judgehost:
+    image: domjudge/judgehost:latest
+    depends_on:
+      - mariadb
+    env_file: .env
+    ports:
+      - "9091:80"
+    networks:
+      - domserver
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+networks:
+  domserver:
+    driver: bridge
